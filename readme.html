@@ -38,9 +38,10 @@
         <h2>Installation</h2>
         <p>1 - Install the Tilkee Connector module with SugarCRM module loader</p>
         <p>2 - Go to "Connector Settings / Enable Connectors" to activate connector for users and select modules available to access Tilkee information</p>
-        <p>3 - Go to "Connector Settings / Map Connectors fields" to select module field where stored tilkee project ID</p>
-        <p>4 - Users have to create an external link in their profil to connect to their Tilkee account</p>
-        <p>5 - Now a Tilkee subpanel appear in selected objects to access to project stats or to select a project (proposal or brochure)</p>
+        <p>3 - Go to "Tilkee / General parameters" to configure TILKEE server URL: https://app.tilkee.com</p>
+        <p>4 - Users have to create an external link in their profil to connect to their Tilkee account: go to https://app.tilkee.com/oauth/applications to creat a new application, with return URL "http://YOU_SUGAR_URL/retourToken.php" </p>
+        <p>5 - Retrive client id to update "TILKEE Client ID" in Tilkee / General parameters" (you don't secret key)
+        <p>6 - Now a Tilkee subpanel appear in selected objects to access to project stats or to select a project (proposal or brochure)</p>
         <p> Remark : sometimes it is necessary to "Rebuild and Repair" to clean the ExternalAPI cache file</p>
         <h2>FAQ</h2>
         <p><b>TILKEE doesn't appear in application list when I want to create an external link</b><br/>
