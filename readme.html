@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+/* 
+ * Copyright 2014 TILKEE.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<html>
+    <head>
+        <title>TILKEE Connector for SugarCRM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>TILKEE Connector for SugarCRM</h1>
+        <p>This connector is design to access to TILKEE server information from your SugarCRM instance</p>   
+        <p>see below for more information</p>
+        <h2>ChangeLog</h2>
+        <p>version 1.0</p>
+        <ul>
+            <li>EAPM access to connect to tilkee</li>
+            <li>External API access to Tilkee REST service</li>
+            <li>Set and Access to projects Tilkee Stats</li>
+            <li>Links Tilkee brochure to Contacts, Accounts and Leads</li>
+            <li>Links Tilkee proposal to Opportunities</li>
+        </ul>
+        <h2>Installation</h2>
+        <p>1 - Install the Tilkee Connector module with SugarCRM module loader</p>
+        <p>2 - Go to "Connector Settings / Enable Connectors" to activate connector for users and select modules available to access Tilkee information</p>
+        <p>3 - Go to "Connector Settings / Map Connectors fields" to select module field where stored tilkee project ID</p>
+        <p>4 - Users have to create an external link in their profil to connect to their Tilkee account</p>
+        <p>5 - Now a Tilkee subpanel appear in selected objects to access to project stats or to select a project (proposal or brochure)</p>
+        <p> Remark : sometimes it is necessary to "Rebuild and Repair" to clean the ExternalAPI cache file</p>
+        <h2>FAQ</h2>
+        <p><b>TILKEE doesn't appear in application list when I want to create an external link</b><br/>
+            In the Administration screen, go to Repair and "Quick Repair and Rebuild"
+        </p>
+        <h2>Licence</h2>
+        <pre>
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.         
+        </pre>
+    </body>
+</html>
