@@ -81,8 +81,8 @@ $mod_strings = array (
     
 
 // IFRAME PANELS    
-  'IFRAME_STATS' => 'Statists',
-  'IFRAME_EDIT'  => 'Editi project',
+  'IFRAME_STATS' => 'Stats',
+  'IFRAME_EDIT'  => 'Edit project',
 
 // ERROR MESSAGES
   'LBL_ERROR_DELETE_ON_TILKEE' => 'WARNING : delete error on TILKEE server',  
