@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ $http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,8 @@ require_once('include/externalAPI/Base/ExternalAPIBase.php');
 
 class ExtAPITilkee extends ExternalAPIBase {
     
-    var $app_base_url  = "http://www.tilkee.fr";
+    var $app_base_url  = "https://api.tilkee.com";
+	var $app_url_front = "https://app2.tilkee.com";
     var $client_id     = "";
     var $client_secret = "";
     var $access_token  = "";
@@ -35,6 +36,7 @@ class ExtAPITilkee extends ExternalAPIBase {
         if (isset($sugar_config['tilkee']['url_tilkee']) && !empty($sugar_config['tilkee']['url_tilkee'])) {
             $this->app_base_url = $sugar_config['tilkee']['url_tilkee'];
         }
+		$this->app_url_front  = ($GLOBALS['current_language']=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
     }
     
     function init_curl_session ($url) {
@@ -44,6 +46,7 @@ class ExtAPITilkee extends ExternalAPIBase {
         curl_setopt($this->curl_session_id, CURLOPT_POST, true);
         curl_setopt($this->curl_session_id, CURLOPT_HEADER, false);
         curl_setopt($this->curl_session_id, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Content-Type: application/json")); 
     }
 
     /*
@@ -101,17 +104,17 @@ class ExtAPITilkee extends ExternalAPIBase {
              "grant_type"   => "password"
         );
     
-        curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
+        curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($post_parameters));
         $response = curl_exec($this->curl_session_id);    
         $result_call = json_decode($response);
         
         /*
          * return structure if success :
-         *      access_token  : <access_token>
-         *      token_type    :"bearer"
-         *      expires_in    :7200
-         *      refresh_token : <refresh_token>
-         *      scope         : $scope
+         $access_token  : <access_token>
+         $token_type    :"bearer"
+         $expires_in    :7200
+         $refresh_token : <refresh_token>
+         $scope         : $scope
          */
         
         session_start();
@@ -163,7 +166,7 @@ class ExtAPITilkee extends ExternalAPIBase {
              "refresh_token" => $this->refresh_token
         );
 
-        curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
+        curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($post_parameters));
         $response = curl_exec($this->curl_session_id);    
         $result_call = json_decode($response);
         
@@ -192,32 +195,33 @@ class ExtAPITilkee extends ExternalAPIBase {
      */    
     function get_projects_list() {
         
-        $curl_url = "/api/v2/projects?access_token=".$this->access_token;
+        $curl_url = "/projects";
         $this->init_curl_session($curl_url);
 
         curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+		curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$this->access_token)); 
 
         $response = curl_exec($this->curl_session_id);            
         $result_call = json_decode($response);
                 
         /*
          * return structure if success : Array of Projects
-         *      IDX => stdobj
-         *          stdobj->project->id
-         *          stdobj->project->name
-         *          stdobj->project->created_at
-         *          stdobj->project->updated_at
-         *          stdobj->project->tokens_count
-         *          stdobj->project->kind (proposal| brochure)
-         *          stdobj->project->status (draft | published)
-         *          stdobj->project->leader
-         *          stdobj->project->last_connexion
-         *          stdobj->project->total_time
-         *          stdobj->project->visible_since
-         *          stdobj->project->url
-         *          stdobj->project->edit_url
-         *          stdobj->project->preview_url
-         *          stdobj->project->stat_url
+         $IDX => stdobj
+         $    stdobj->project->id
+         $    stdobj->project->name
+         $    stdobj->project->created_at
+         $    stdobj->project->updated_at
+         $    stdobj->project->tokens_count
+         $    stdobj->project->kind (proposal| brochure)
+         $    stdobj->project->status (draft | published)
+         $    stdobj->project->leader
+         $    stdobj->project->last_connexion
+         $    stdobj->project->total_time
+         $    stdobj->project->visible_since
+         $    stdobj->project->url
+         $    stdobj->project->edit_url
+         $    stdobj->project->preview_url
+         $    stdobj->project->stat_url
          *  
          */
 
@@ -241,38 +245,40 @@ class ExtAPITilkee extends ExternalAPIBase {
         $access_token = $this->get_valid_token();
                 
         if (!empty($access_token)) {
-            $curl_url = "/api/v2/projects/".$project_id."?access_token=".$access_token;
+            $curl_url = "/projects/".$project_id;
             $this->init_curl_session($curl_url);
 
             curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token)); 
+			
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 			
             /*
              * return structure if success : 
-             *      project->id
-             *      project->name
-             *      project->won
-             *      project->created_at
-             *      project->updated_at
-             *      project->activated_at
-             *      project->archived_at
-             *      project->deleted_at
-             *      project->customer_type
-             *      project->total_connexions
-             *      project->leader_id
-             *      project->leader
-             *      project->last_sign_in_at
-             *      project->total_time
-             *      project->status (reviewing)
-             *      project->visible_since
-             *      project->tilk_count (= 0)
-             *      project->employees (= Array ([0] => <leader_id>) )
-             *      project->url
-             *      project->edit_url
-             *      project->preview_url
-             *      project->stat_url
-             *      project->tilks = array()
+             $project->id
+             $project->name
+             $project->won
+             $project->created_at
+             $project->updated_at
+             $project->activated_at
+             $project->archived_at
+             $project->deleted_at
+             $project->customer_type
+             $project->total_connexions
+             $project->leader_id
+             $project->leader
+             $project->last_sign_in_at
+             $project->total_time
+             $project->status (reviewing)
+             $project->visible_since
+             $project->tilk_count (= 0)
+             $project->employees (= Array ([0] => <leader_id>) )
+             $project->url
+             $project->edit_url
+             $project->preview_url
+             $project->stat_url
+             $project->tilks = array()
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
@@ -282,6 +288,20 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return $result_call ;
             } else {
+				$result_call->last_sign_in_at = $result_call->last_access;
+				$result_call->deleted_at       = '';
+				$result_call->visible_since    = $result_call->activated_at;
+				$result_call->leader_id        = $result_call->leader->id;
+				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
+				$result_call->tilks_count      = '';
+				$result_call->active_tilk      = '';
+				$result_call->total_connexions = $result_call->nb_connections;
+				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
+				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
+				$result_call->preview_url      = $result_call->preview;
+				$result_call->stat_url         = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				$result_call->stat_iframe 	   = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+
                 return $result_call;
             }
         } else {
@@ -295,47 +315,56 @@ class ExtAPITilkee extends ExternalAPIBase {
      */    
     function create_project($name, $kind = 'brochure', $duplicate_project_id = '') {
         
-        $curl_url = "/api/v2/projects";
-        $this->init_curl_session($curl_url);
         
         $access_token = $this->get_valid_token();
-        
         if (!empty($access_token)) {
-            $post_parameters = array(
-                "access_token"          => $access_token,
-                "name"                  => $name,
-                "kind"                  => $kind,
-                "duplicate_project_id"  => $duplicate_project_id
-            );
+            if($duplicate_project_id > 0) { // Cas duplicate
+				$curl_url = "/projects/".$duplicate_project_id."/duplicate";
+				$this->init_curl_session($curl_url);
+				curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token)); 
+				$response = curl_exec($this->curl_session_id);    
+				$result_call = json_decode($response);
+				//TODO MAJ name !!
+			} else {
+				$curl_url = "/projects";
+				$this->init_curl_session($curl_url);
+        
+				$post_parameters = array(
+					//"access_token"          => $access_token,
+					"name"                  => $name,
+					//"kind"                  => $kind,
+					//"duplicate_project_id"  => $duplicate_project_id
+				);
 
-            curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
-            $response = curl_exec($this->curl_session_id);    
-            $result_call = json_decode($response);
-
+				curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($post_parameters));
+				curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json")); 
+				$response = curl_exec($this->curl_session_id);  
+				$result_call = json_decode($response);
+			}
             /*
              * return structure if success : 
-             *      project->id
-             *      project->name
-             *      project->won
-             *      project->created_at
-             *      project->updated_at
-             *      project->activated_at
-             *      project->archived_at
-             *      project->deleted_at
-             *      project->customer_type
-             *      project->total_connexions
-             *      project->leader_id
-             *      project->leader
-             *      project->last_sign_in_at
-             *      project->total_time
-             *      project->status (reviewing)
-             *      project->visible_since
-             *      project->tilk_count (= 0)
-             *      project->employees (= Array ([0] => <leader_id>) )
-             *      project->url
-             *      project->edit_url
-             *      project->preview_url
-             *      project->stat_url
+             $project->id
+             $project->name
+             $project->won
+             $project->created_at
+             $project->updated_at
+             $project->activated_at
+             $project->archived_at
+             $project->deleted_at
+             $project->customer_type
+             $project->total_connexions
+             $project->leader_id
+             $project->leader
+             $project->last_sign_in_at
+             $project->total_time
+             $project->status (reviewing)
+             $project->visible_since
+             $project->tilk_count (= 0)
+             $project->employees (= Array ([0] => <leader_id>) )
+             $project->url
+             $project->edit_url
+             $project->preview_url
+             $project->stat_url
              *  
              */
 
@@ -346,6 +375,20 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
+				$result_call->last_sign_in_at = $result_call->last_access;
+				$result_call->deleted_at       = '';
+				$result_call->visible_since    = $result_call->activated_at;
+				$result_call->leader_id        = $result_call->leader->id;
+				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
+				$result_call->tilks_count      = '';
+				$result_call->active_tilk      = '';
+				$result_call->total_connexions = $result_call->nb_connections;
+				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
+				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
+				$result_call->preview_url      = $result_call->preview;
+				$result_call->stat_url         = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				$result_call->stat_iframe 	   = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				
                 return $result_call;
             }
         } else {
@@ -361,48 +404,48 @@ class ExtAPITilkee extends ExternalAPIBase {
         
         $access_token = $this->get_valid_token();
 
-		$curl_url = "/api/v2/projects/".$project_id;
+		$curl_url = "/projects/".$project_id;
 		$this->init_curl_session($curl_url);
         
         if (!empty($access_token)) {
             $put_parameters = array(
-                "access_token" => $access_token,
                 "name"         => $name,
-                "kind"         => $kind,
-                "won"          => $won,
-                "archived"     => $archived
+                "won"          => $won                
             );
+			if($archived) $put_parameters['archived_at']=date("Y-m-d H:i:s");
+			
 
 			curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
-			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $put_parameters);			
+			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));	
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json")); 			
 			
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 
             /*
              * return structure if success : 
-             *      project->id
-             *      project->name
-             *      project->won
-             *      project->created_at
-             *      project->updated_at
-             *      project->activated_at
-             *      project->archived_at
-             *      project->deleted_at
-             *      project->customer_type
-             *      project->total_connexions
-             *      project->leader_id
-             *      project->leader
-             *      project->last_sign_in_at
-             *      project->total_time
-             *      project->status (reviewing)
-             *      project->visible_since
-             *      project->tilk_count (= 0)
-             *      project->employees (= Array ([0] => <leader_id>) )
-             *      project->url
-             *      project->edit_url
-             *      project->preview_url
-             *      project->stat_url
+             $project->id
+             $project->name
+             $project->won
+             $project->created_at
+             $project->updated_at
+             $project->activated_at
+             $project->archived_at
+             $project->deleted_at
+             $project->customer_type
+             $project->total_connexions
+             $project->leader_id
+             $project->leader
+             $project->last_sign_in_at
+             $project->total_time
+             $project->status (reviewing)
+             $project->visible_since
+             $project->tilk_count (= 0)
+             $project->employees (= Array ([0] => <leader_id>) )
+             $project->url
+             $project->edit_url
+             $project->preview_url
+             $project->stat_url
              *  
              */
 
@@ -413,6 +456,19 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
+				$result_call->last_sign_in_at = $result_call->last_access;
+				$result_call->deleted_at       = '';
+				$result_call->visible_since    = $result_call->activated_at;
+				$result_call->leader_id        = $result_call->leader->id;
+				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
+				$result_call->tilks_count      = '';
+				$result_call->active_tilk      = '';
+				$result_call->total_connexions = $result_call->nb_connections;
+				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
+				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
+				$result_call->preview_url      = $result_call->preview;
+				$result_call->stat_url         = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				$result_call->stat_iframe 	   = $this->app_url_front.'/project/'.$result_call->id.'/stats';
                 return $result_call;
             }
         } else {
@@ -429,27 +485,22 @@ class ExtAPITilkee extends ExternalAPIBase {
         if ($project_id == '')
             return -1;
         
-        $curl_url = "/api/v2/projects/".$project_id;
-        
         $access_token = $this->get_valid_token();
         
         if (!empty($access_token)) {
-            $curl_url = '/api/v2/projects/'.$project_id;
-            $this->init_curl_session($curl_url);
-
-		    $put_parameters = array(
-		        "access_token" => $access_token
-		    );
+            $curl_url = '/projects/'.$project_id;
+            $this->init_curl_session($curl_url);		   
 			
             curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'DELETE');
-            curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $put_parameters);
+            curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, false);
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json"));
 
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 
             /*
              * return structure if success : 
-             *      "ProjectName has been deleted successfully"
+             $"ProjectName has been deleted successfully"
              *  
              */
 
@@ -477,27 +528,29 @@ class ExtAPITilkee extends ExternalAPIBase {
         
         if (!empty($access_token)) {
             
-            $curl_url = '/api/v2/projects/'.$project_id.'/tilks/'.$tilk_id.'?access_token='.$access_token;
+            $curl_url = '/projects/'.$project_id.'/tokens';
             $this->init_curl_session($curl_url);
             
             curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token));
+			
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 
             /*
              * return structure if success : 
-             *      tilk->id
-             *      tilk->title
-             *      tilk->last_sign_in_at
-             *      tilk->url
-             *      tilk->won
-             *      tilk->created_at
-             *      tilk->archived_at
-             *      tilk->contact_id
-             *      tilk->contact
-             *      tilk->total_time
-             *      tilk->total_connexion
-             *      tilk->connexions
+             $tilk->id
+             $tilk->title
+             $tilk->last_sign_in_at
+             $tilk->url
+             $tilk->won
+             $tilk->created_at
+             $tilk->archived_at
+             $tilk->contact_id
+             $tilk->contact
+             $tilk->total_time
+             $tilk->total_connexion
+             $tilk->connexions
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
@@ -506,14 +559,66 @@ class ExtAPITilkee extends ExternalAPIBase {
                         $this->get_token_access();
                 $this->set_log_error($result_call);
                 return -1 ;
-            } else {
-                return $result_call;
+            } else { //on parcours les résultats...
+				foreach($result_call->contents as $tilk) {
+					if($tilk->id ==$tilk_id) {
+						$tilk->title = $tilk->name;
+						$tilk->last_sign_in_at = $tilk->last_signin;
+						$tilk->url = $tilk->link; 
+						$tilk->contact_id = ''; 
+						$tilk->contact = '';
+						$tilk->total_connexion = $tilk->nb_connections;
+						$tilk->connexions = $this->infos_connections($project_id, $tilk_id);
+						return $tilk;
+					}
+				}
+                $this->set_log_error('no tilk found');
+                return -1 ;
             }
         } else {
             return -1 ;
         }        
     } 
     
+	function infos_connections($project_id, $tilk_id) {
+        
+        $access_token = $this->get_valid_token();
+        
+        if (!empty($access_token)) {
+            
+            $curl_url = '/projects/'.$project_id.'/connexions?tokens='.$tilk_id;
+            $this->init_curl_session($curl_url);
+            
+            curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token));
+			
+            $response = curl_exec($this->curl_session_id);    
+            $result_call = json_decode($response);
+
+            if (isset($result_call->status) && isset($result_call->body->error)) {
+            	$GLOBALS['log']->fatal('infos_tilk - result_call -> '.print_r($result_call,true));            	                                    
+                if ($result_call->status == 'unauthorized')
+                        $this->get_token_access();
+                $this->set_log_error($result_call);
+                return -1 ;
+            } else { //On parcours
+				$result_array=array();
+				foreach($result_call->contents as $connexion) {
+					$connexion->device = $connexion->platform->device_type.' '.$connexion->platform->device_number;
+					$connexion->browser = $connexion->platform->browser;
+					$connexion->plateform = $connexion->platform->device_type;
+					$connexion->os = $connexion->platform->os;
+					$connexion->ip_address = $connexion->platform->ip;
+					$connexion->downloads = $connexion->downloaded;
+					$result_array[]=$connexion;
+				}
+				return $result_array;
+			}
+        } else {
+            return -1 ;
+        }        
+    }
+	
     /*
      * Create tilk
      * OK V1
@@ -524,26 +629,27 @@ class ExtAPITilkee extends ExternalAPIBase {
         
         if (!empty($access_token)) {
             
-            $curl_url = '/api/v2/projects/'.$project_id.'/tilks?access_token='.$access_token;
+            $curl_url = '/projects/'.$project_id.'/tokens';
             $this->init_curl_session($curl_url);
             
-            $post_parameters = array(
-                "title" => $tilk_name
-            );
+            $post_parameters = '{"persons": [{"name": "'.$tilk_name.'"}]}';
+			
 
             curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json"));
+			
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 
             /*
              * return structure if success : 
-             *      tilk->id
-             *      tilk->title
-             *      tilk->url
-             *      tilk->won
-             *      tilk->archived_at
-             *      tilk->contact_id
-             *      tilk->contact
+             $tilk->id
+             $tilk->title
+             $tilk->url
+             $tilk->won
+             $tilk->archived_at
+             $tilk->contact_id
+             $tilk->contact
              *  
              */
 
@@ -554,7 +660,14 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
-                return $result_call;
+				$tilk = $result_call->contents[0];
+				
+				$tilk->title = $tilk->name;
+				$tilk->url = $tilk->link;
+				$tilk->contact_id = ''; 
+				$tilk->contact = '';
+						
+                return $tilk;
             }
         } else {
             return -1 ;
@@ -569,33 +682,40 @@ class ExtAPITilkee extends ExternalAPIBase {
     function update_tilk($project_id, $tilk_id, $tilk_name = '', $won = '', $archived = '') {
         
         $access_token = $this->get_valid_token();
-        
         if (!empty($access_token)) {
-            
-            $curl_url = '/api/v2/projects/'.$project_id.'/tilks/'.$tilk_id;
-            $this->init_curl_session($curl_url);
-            
-            $put_parameters = array(
-                "access_token" => $access_token,
-                "title"        => $tilk_name,
-                "won"          => $won,
-                "archived"     => $archived,
-            );
-
+           
+			$curl_url = '/tokens/'.$tilk_id;
+			$put_parameters = array(
+			"name"        => $tilk_name,
+			"won"          => $won
+			);
+			$this->init_curl_session($curl_url);
+			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));				
+			
             curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $put_parameters);			
+			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json"));
+			
             $response = curl_exec($this->curl_session_id);    
-            $result_call = json_decode($response);
+			$result_call = json_decode($response);
 
-            /*
+			if($archived) {
+				$curl_url = '/tokens/'.$tilk_id.'/archive';
+				$this->init_curl_session($curl_url);
+				curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, false);
+				curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
+				curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json"));
+				$response = curl_exec($this->curl_session_id);    
+				$result_call = json_decode($response);
+			}
+			/*
              * return structure if success : 
-             *      tilk->id
-             *      tilk->title
-             *      tilk->url
-             *      tilk->won
-             *      tilk->archived_at
-             *      tilk->contact_id
-             *      tilk->contact
+             $tilk->id
+             $tilk->title
+             $tilk->url
+             $tilk->won
+             $tilk->archived_at
+             $tilk->contact_id
+             $tilk->contact
              *  
              */
 
@@ -606,6 +726,10 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
+				$result_call->title = $result_call->name;
+				$result_call->url = $result_call->link;
+				$result_call->contact_id = ''; 
+				$result_call->contact = '';
                 return $result_call;
             }
         } else {
