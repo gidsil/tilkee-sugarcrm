@@ -1,4 +1,7 @@
 <?php
+//TODO
+//Supprimer type de projet (vues création/edition)
+//TILKS --> last connectoin date
 
 /* 
  * Copyright 2014 TILKEE.
@@ -297,10 +300,11 @@ class ExtAPITilkee extends ExternalAPIBase {
 				$result_call->active_tilk      = '';
 				$result_call->total_connexions = $result_call->nb_connections;
 				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
+				//$result_call->edit_url         = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fitems';
 				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
 				$result_call->preview_url      = $result_call->preview;
 				$result_call->stat_url         = $this->app_url_front.'/project/'.$result_call->id.'/stats';
-				$result_call->stat_iframe 	   = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				$result_call->stat_iframe 	   = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fitems';
 
                 return $result_call;
             }
@@ -624,7 +628,7 @@ class ExtAPITilkee extends ExternalAPIBase {
      * OK V1
      */    
     function create_tilk($project_id, $tilk_name, $contact_id = '') {
-        
+$GLOBALS['log']->fatal("Debut function create_tilk: " . $project_id);	        
         $access_token = $this->get_valid_token();
         
         if (!empty($access_token)) {
@@ -637,7 +641,7 @@ class ExtAPITilkee extends ExternalAPIBase {
 
             curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
 			curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Authorization: Bearer ".$access_token,"Content-Type: application/json"));
-			
+//die($post_parameters.'-'.$access_token.'-'.$curl_url);			
             $response = curl_exec($this->curl_session_id);    
             $result_call = json_decode($response);
 
@@ -661,15 +665,21 @@ class ExtAPITilkee extends ExternalAPIBase {
                 return -1 ;
             } else {
 				$tilk = $result_call->contents[0];
-				
+//die(print_r($tilk));				
 				$tilk->title = $tilk->name;
 				$tilk->url = $tilk->link;
 				$tilk->contact_id = ''; 
 				$tilk->contact = '';
-						
+				$tilk->archived_at = '';
+				//$tilk->won = '';
+				$tilk->total_time = 0;
+				$tilk->total_connexion = 0;
+				$tilk->last_sign_in_at = '';
+$GLOBALS['log']->fatal("New TILK: " . print_r($tilk, true));	
                 return $tilk;
             }
         } else {
+			$GLOBALS['log']->fatal("Fin function create_tilk ERROR: " . $project_id);	        
             return -1 ;
         }        
     } 
@@ -680,6 +690,7 @@ class ExtAPITilkee extends ExternalAPIBase {
      * OK V1
      */    
     function update_tilk($project_id, $tilk_id, $tilk_name = '', $won = '', $archived = '') {
+$GLOBALS['log']->fatal("Debut function update_tilk: " . $project_id.'-'.$tilk_id);	        
         
         $access_token = $this->get_valid_token();
         if (!empty($access_token)) {
@@ -689,6 +700,7 @@ class ExtAPITilkee extends ExternalAPIBase {
 			"name"        => $tilk_name,
 			"won"          => $won
 			);
+$GLOBALS['log']->fatal("Debut function update_tilk request: " . $curl_url.'-'.$access_token.'-'.print_r($put_parameters,true));	 			
 			$this->init_curl_session($curl_url);
 			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));				
 			
@@ -697,8 +709,9 @@ class ExtAPITilkee extends ExternalAPIBase {
 			
             $response = curl_exec($this->curl_session_id);    
 			$result_call = json_decode($response);
-
-			if($archived) {
+$GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_call,true));	 			
+			if($archived=='true') {
+				$GLOBALS['log']->fatal("Debut function update_tilk ARCHIVE !!: " . $archived.'-'.$tilk_id);	        
 				$curl_url = '/tokens/'.$tilk_id.'/archive';
 				$this->init_curl_session($curl_url);
 				curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, false);
@@ -730,6 +743,8 @@ class ExtAPITilkee extends ExternalAPIBase {
 				$result_call->url = $result_call->link;
 				$result_call->contact_id = ''; 
 				$result_call->contact = '';
+				$result_call->total_connexion = $result_call->nb_connections;
+				$result_call->connexions = $this->infos_connections($project_id, $tilk_id);
                 return $result_call;
             }
         } else {
