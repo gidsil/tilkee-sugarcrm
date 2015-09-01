@@ -39,11 +39,11 @@ class TILKEE_PROJECTSViewDetail extends ViewDetail {
             }
             $this->ss->assign("STAT_URL", $stat_url);
             // Build Stat url 
-            $preview_url = "";
+            /*$preview_url = "";
             if (isset($current_user->tilkee_token_c) && !empty($current_user->tilkee_token_c) && !empty($this->bean->preview_url)) {
                 $preview_url = $this->bean->preview_url.'&access_token='.$current_user->tilkee_token_c;
-            }
-            $this->ss->assign("PREVIEW_URL", $preview_url);
+            }*/
+            $this->ss->assign("PREVIEW_URL", $this->bean->preview_url);
                         
             $button_array = $this->dv->defs['templateMeta']['form']['buttons'] ;
             $new_button_array = array();
