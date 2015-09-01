@@ -27,6 +27,6 @@ $app_list_strings['status_list']['pending_approval'] = 'Pending Approval';
 $app_list_strings['status_list']['activated']        = 'Activated';
 $app_list_strings['status_list']['archived']         = 'Archived';
 
-$app_list_strings['won_archived_list']['']       = '';
+$app_list_strings['won_archived_list']['null']       = '';
 $app_list_strings['won_archived_list']['true']   = 'True';
 $app_list_strings['won_archived_list']['false']  = 'False';
