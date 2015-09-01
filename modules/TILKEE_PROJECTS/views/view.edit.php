@@ -64,11 +64,11 @@ class TILKEE_PROJECTSViewEdit extends ViewEdit {
             }
 
             // Build Stat url 
-            $edit_url = "";
+            /*$edit_url = "";
             if (isset($current_user->tilkee_token_c) && !empty($current_user->tilkee_token_c) && !empty($this->bean->edit_url)) {
                 $edit_url = $this->bean->edit_url.'&access_token='.$current_user->tilkee_token_c;
-            }
-            $this->ss->assign("EDIT_URL", $edit_url);
+            }*/
+            $this->ss->assign("EDIT_URL", $this->bean->edit_url);
 
             
             parent::display();
