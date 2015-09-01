@@ -121,7 +121,7 @@ class TILKEE_TILKS extends Basic {
                 if (($result != -1) && (!empty($result))){
                     // project updated : init bean
                     $this->tilk_url        = $result->url;
-                    $this->won             = ($result->won==1)?'true':'false';
+                    $this->won             = $result->won;
                     $this->created_at      = (!empty($result->created_at))?date('Y-m-d H:i:s', strtotime($result->created_at)):'';
                     $this->archived_at     = (!empty($result->archived_at))?date('Y-m-d H:i:s', strtotime($result->archived_at)):'';
                     $this->last_sign_in_at = (!empty($result->last_sign_in_at))?date('Y-m-d H:i:s', strtotime($result->last_sign_in_at)):'';
