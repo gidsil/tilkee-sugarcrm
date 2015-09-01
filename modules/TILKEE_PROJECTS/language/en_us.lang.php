@@ -62,11 +62,12 @@ $mod_strings = array (
   'LBL_ARCHIVED_AT' => 'Archived',
   'LBL_VISIBLE_SINCE' => 'Visible since',
   'LBL_URL' => 'URL',
-  'LBL_PREVIEW_LABEL' => 'Preview URL',
+  'LBL_PREVIEW_LABEL' => 'Preview project',
+  'LBL_PREVIEW_URL' => 'Preview',
   'LBL_EDIT_URL' => 'Edition URL',
   'LBL_STAT_URL' => 'Statistic URL',
   'LBL_STAT_IFRAME' => 'Statistic Iframe',
-  'LBL_TILKEEE_ID' => 'TILKEE ID',
+  'LBL_TILKEE_ID' => 'TILKEE ID',
     
 // SPECIFIC ACTIONS
   'LBL_WON_TITLE'         => 'Archive/Win',
@@ -81,8 +82,8 @@ $mod_strings = array (
     
 
 // IFRAME PANELS    
-  'IFRAME_STATS' => 'Stats',
-  'IFRAME_EDIT'  => 'Edit project',
+  'IFRAME_STATS' => 'Statists',
+  'IFRAME_EDIT'  => 'Editi project',
 
 // ERROR MESSAGES
   'LBL_ERROR_DELETE_ON_TILKEE' => 'WARNING : delete error on TILKEE server',  
