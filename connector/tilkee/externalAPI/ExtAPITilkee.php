@@ -296,14 +296,15 @@ class ExtAPITilkee extends ExternalAPIBase {
 				$result_call->visible_since    = $result_call->activated_at;
 				$result_call->leader_id        = $result_call->leader->id;
 				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
+				$result_call->won      		   = ($result_call->won=='na')?(''):($result_call->won);
 				$result_call->tilks_count      = '';
 				$result_call->active_tilk      = '';
 				$result_call->total_connexions = $result_call->nb_connections;
 				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
 				//$result_call->edit_url         = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fitems';
-				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
+				$result_call->edit_url         = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fitems'; //$this->app_url_front.'/project/'.$result_call->id.'/items';
 				$result_call->preview_url      = $result_call->preview;
-				$result_call->stat_url         = $this->app_url_front.'/project/'.$result_call->id.'/stats';
+				$result_call->stat_url         = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fstats'; //$this->app_url_front.'/project/'.$result_call->id.'/stats';
 				$result_call->stat_iframe 	   = $this->app_url_front.'/login/oauth?token='.$access_token.'&redirect_to=%2Fproject%2F'.$result_call->id.'%2Fitems';
 
                 return $result_call;
@@ -386,6 +387,7 @@ class ExtAPITilkee extends ExternalAPIBase {
 				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
 				$result_call->tilks_count      = '';
 				$result_call->active_tilk      = '';
+				$result_call->won      		   = '';
 				$result_call->total_connexions = $result_call->nb_connections;
 				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
 				$result_call->edit_url         = $this->app_url_front.'/project/'.$result_call->id.'/items';
