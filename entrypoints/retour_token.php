@@ -25,9 +25,11 @@ global $sugar_config, $current_user;
  * Retrieve and save token in a cookie
  */
 if (isset($_REQUEST['access_token']) && !empty($_REQUEST['access_token'])) {
+	$current_user->tilkee_refresh_token_c = $_REQUEST['refresh_token'];
     $current_user->tilkee_token_c = $_REQUEST['access_token'];
+	$current_user->tilkee_expires_c = time()+$_REQUEST['expires_in'];
     $current_user->save();
-
+	$GLOBALS['log']->debug('TILKEE - retourToken:'.$_REQUEST['access_token']);
     SugarApplication::redirect("index.php");
 } 
     
