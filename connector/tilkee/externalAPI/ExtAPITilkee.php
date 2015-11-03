@@ -39,7 +39,7 @@ class ExtAPITilkee extends ExternalAPIBase {
         if (isset($sugar_config['tilkee']['url_tilkee']) && !empty($sugar_config['tilkee']['url_tilkee'])) {
             $this->app_base_url = $sugar_config['tilkee']['url_tilkee'];
         }
-		$this->app_url_front  = ($GLOBALS['current_language']=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
+		$this->app_url_front  = (strtolower($GLOBALS['current_language'])=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
 		$GLOBALS['log']->debug('TILKEE - app_base_url:'.$this->app_base_url.' - app_url_front:'.$this->app_url_front);
     }
     
