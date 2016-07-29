@@ -1,7 +1,7 @@
 <?php
 if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
 
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ $display_title	= '' ;
 if(isset($_REQUEST['process']) && $_REQUEST['process'] == 'true') {
     require_once('custom/include/externalAPI/Tilkee/ExtAPITilkee.php');
     $tilkee = new ExtAPITilkee();
-    
+
     switch ($_REQUEST['test_action']) {
         case 'test_token':
             $result = $tilkee->get_token_access();
@@ -115,20 +115,23 @@ if(isset($_REQUEST['process']) && $_REQUEST['process'] == 'true') {
         default:
             break;
     }
-        
-    /* 
+
+    /*
      * Update admini parameters
      */
     if (isset($_REQUEST['url_tilkee'])) {
-        $cfg->config['tilkee']['url_tilkee'] = $_REQUEST['url_tilkee'] ;        
+        $cfg->config['tilkee']['url_tilkee'] = $_REQUEST['url_tilkee'] ;
+    }
+    if (isset($_REQUEST['url_tilkee_front'])) {
+        $cfg->config['tilkee']['url_tilkee_front'] = $_REQUEST['url_tilkee_front'] ;
     }
     if (isset($_REQUEST['user_scheduler'])) {
-        $cfg->config['tilkee']['user_scheduler'] = $_REQUEST['user_scheduler'] ;        
+        $cfg->config['tilkee']['user_scheduler'] = $_REQUEST['user_scheduler'] ;
     }
     if (isset($_REQUEST['client_id'])) {
-        $cfg->config['tilkee']['client_id'] = $_REQUEST['client_id'] ;                
+        $cfg->config['tilkee']['client_id'] = $_REQUEST['client_id'] ;
     }
-    
+
     $cfg->handleOverride();
     //header('Location: index.php?module=Administration&action=index');
 }
@@ -148,6 +151,7 @@ $sugar_smarty->assign('DISPLAY_RESULT', $display_result);
 $sugar_smarty->assign('DISPLAY_TITLE', $display_title);
 
 $sugar_smarty->assign('URL_TILKEE', $cfg->config['tilkee']['url_tilkee']);
+$sugar_smarty->assign('URL_TILKEE_FRONT', $cfg->config['tilkee']['url_tilkee_front']);
 $sugar_smarty->assign('TILKEE_CLIENT_ID', $cfg->config['tilkee']['client_id']);
 // Scheduler users dropbox
 $users_array = get_bean_select_array(false, 'User','user_name', ' users.status="Active" AND users.deleted=0 ','user_name',false);

@@ -150,7 +150,17 @@
             &nbsp;
         </td>
     </tr>
-    <tr>
+     <tr>
+        <td  scope="row" width="200">{$MOD.LBL_URL_TILKEE_FRONT}: </td>
+        <td>            
+            <input id="url_tilkee_front" type="text" title="" value="{$URL_TILKEE_FRONT}" maxlength="255" size="50" name="url_tilkee_front">
+        </td>
+        <td  scope="row" width="200">&nbsp;</td>
+        <td>
+            &nbsp;
+        </td>
+    </tr>
+   <tr>
         <td  scope="row" width="200">{$MOD.LBL_AUTHENT_SCHEDULER}: </td>
         <td>            
             <select id="user_scheduler" name="user_scheduler">{$SELECT_USER_SCHEDULER}</select>

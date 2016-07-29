@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ $mod_strings['LBL_CONFIG_PARAM'] = 'Client ID, scheduled job, TILKEE API';
 // GENERAL PARAMETERS
 $mod_strings['LBL_GENERAL_PARAMETERS'] = 'General parameters';
 $mod_strings['LBL_URL_TILKEE']         = 'TILKEE server URL';
+$mod_strings['LBL_URL_TILKEE_FRONT']   = 'TILKEE front interface URL';
 $mod_strings['LBL_AUTHENT_SCHEDULER']  = 'Scheduled job user';
 $mod_strings['LBL_CLIENT_ID']          = 'TILKEE Client ID';
 
