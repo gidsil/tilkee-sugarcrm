@@ -3,7 +3,7 @@
 //Supprimer type de projet (vues création/edition)
 //TILKS --> last connectoin date
 
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 require_once('include/externalAPI/Base/ExternalAPIBase.php');
 
 class ExtAPITilkee extends ExternalAPIBase {
-    
+
     var $app_base_url  = "https://api.tilkee.com";
 	var $app_url_front = "https://app2.tilkee.com";
     var $client_id     = "";
@@ -30,9 +30,9 @@ class ExtAPITilkee extends ExternalAPIBase {
     var $access_token  = "";
     var $expire_token = "";
     var $scope         = "";
-    
+
     var $curl_session_id ;
-    
+
 
     function __construct($client_id = '', $client_secret = '') {
         global $sugar_config;
@@ -42,14 +42,14 @@ class ExtAPITilkee extends ExternalAPIBase {
 		$this->app_url_front  = (strtolower($GLOBALS['current_language'])=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
 		$GLOBALS['log']->debug('TILKEE - app_base_url:'.$this->app_base_url.' - app_url_front:'.$this->app_url_front);
     }
-    
+
     function init_curl_session ($url,$needAuth=true) {
     	$this->curl_session_id = curl_init($this->app_base_url.$url);
         curl_setopt($this->curl_session_id, CURLOPT_POST, true);
         curl_setopt($this->curl_session_id, CURLOPT_HEADER, false);
         curl_setopt($this->curl_session_id, CURLOPT_RETURNTRANSFER, true);
 		if($needAuth) curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Content-Type: application/json","Authorization: Bearer ".$this->access_token));
-		else curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Content-Type: application/json")); 
+		else curl_setopt($this->curl_session_id, CURLOPT_HTTPHEADER, Array("Content-Type: application/json"));
     }
 
     /*
@@ -57,48 +57,48 @@ class ExtAPITilkee extends ExternalAPIBase {
      * OK V1
      */
     function init_tilkee_access_eapm () {
-        
-        $eapmBean = EAPM::getLoginInfo('tilkee', true);                        
+
+        $eapmBean = EAPM::getLoginInfo('tilkee', true);
 
         $this->loadEAPM($eapmBean);
 
-        if (isset($this->account_name) && ($this->account_name != '') 
+        if (isset($this->account_name) && ($this->account_name != '')
             && isset($this->account_password) && ($this->account_password !='')) {
 
-                $result = $this->get_token_password($this->account_name,$this->account_password);	            
-                return $result ;          
+                $result = $this->get_token_password($this->account_name,$this->account_password);
+                return $result ;
             } else {
                 // ERROR : Connection Information not set
-                return -1;        
+                return -1;
             }
     }
-    
+
     /*
      * Init token information with client_id and client_secret input
      */
     function get_token_access($code = "SUGARCRM", $redirect_uri = "") {
-                
-        global $sugar_config, $current_user;        
-        
+
+        global $sugar_config, $current_user;
+
         $this->init_curl_session("/oauth/authorize", false);
 
-        if ((isset($sugar_config['tilkee']['client_id'])) && (!empty($sugar_config['tilkee']['client_id']))) {        
+        if ((isset($sugar_config['tilkee']['client_id'])) && (!empty($sugar_config['tilkee']['client_id']))) {
             $get_parameters = array(
                  "response_type" => "token",
                  "client_id"     => $sugar_config['tilkee']['client_id'],
                  "redirect_uri"  => $sugar_config['site_url'].'/retourToken.php',
             );
-            $url = $this->app_base_url."/oauth/authorize?".http_build_query($get_parameters);        
+            $url = $this->app_base_url."/oauth/authorize?".http_build_query($get_parameters);
             SugarApplication::redirect($url);
         }
     }
-    
+
     /*
      * Init token information with user_name and password input
-     * 
+     *
      */
     function get_token_password($user_name, $password) {
-                
+
         $this->init_curl_session("/oauth/token/", false);
 
         $post_parameters = array(
@@ -106,11 +106,11 @@ class ExtAPITilkee extends ExternalAPIBase {
              "username"     => $user_name,
              "grant_type"   => "password"
         );
-    
+
         curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($post_parameters));
-        $response = curl_exec($this->curl_session_id);    
+        $response = curl_exec($this->curl_session_id);
         $result_call = json_decode($response);
-        
+
         /*
          * return structure if success :
          $access_token  : <access_token>
@@ -119,16 +119,16 @@ class ExtAPITilkee extends ExternalAPIBase {
          $refresh_token : <refresh_token>
          $scope         : $scope
          */
-        
+
         session_start();
-        
+
         if (isset($result_call->access_token)) {
             $_SESSION['access_token']  = $result_call->access_token;
             $_SESSION['refresh_token'] = $result_call->refresh_token;
             $this->access_token        = $result_call->access_token;
             $this->refresh_token       = $result_call->refresh_token;
         }
-        
+
         if (isset($result_call->error)) {
             $_SESSION['access_token']  = '';
             $_SESSION['refresh_token'] = '';
@@ -139,16 +139,16 @@ class ExtAPITilkee extends ExternalAPIBase {
         $GLOBALS['log']->debug('TILKEE - token:'.$this->access_token);
         return $result_call;
     }
-    
+
     /*
-     * Verify the session token if is set return it  
+     * Verify the session token if is set return it
      * and if not generate a new one
-     * 
+     *
      * return an access_token or an empty string if an error occure
-     * 
+     *
      */
     function get_valid_token() {
-        
+
         global $current_user;
 
         if (isset($current_user->tilkee_token_c) && !empty($current_user->tilkee_token_c)) {
@@ -157,16 +157,16 @@ class ExtAPITilkee extends ExternalAPIBase {
 			$this->expire_token = $current_user->tilkee_expires_c;
 			//die(time().'-'.$this->expire_token);
 			if(time() < $this->expire_token) return $current_user->tilkee_token_c;
-        } 
+        }
 		$token = $this->get_token_access();
 		$GLOBALS['log']->debug('TILKEE - get_token_access:'.$token);
 		$this->access_token = $token;
 		return $token;
-        
+
     }
-    
+
     function refresh_token () {
-        
+
         $this->init_curl_session("/oauth/token/", false);
 
         $post_parameters = array(
@@ -177,14 +177,14 @@ class ExtAPITilkee extends ExternalAPIBase {
         );
 
         curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($post_parameters));
-        $response = curl_exec($this->curl_session_id);    
+        $response = curl_exec($this->curl_session_id);
         $result_call = json_decode($response);
-        
+
         /*
          * return structure if success :
          *  TBD !!!
          */
-        
+
         /* TBD !!!
         if (isset($result_call->access_token)) {
             $this->access_token = $result_call->access_token;
@@ -197,14 +197,14 @@ class ExtAPITilkee extends ExternalAPIBase {
         }
 
         return $result_call;
-        
+
     }
-    
+
     /*
      *  Retrieve projects list
-     */    
+     */
     function get_projects_list() {
-        
+
 		 $access_token = $this->get_valid_token();
 
         if (!empty($access_token)) {
@@ -212,10 +212,10 @@ class ExtAPITilkee extends ExternalAPIBase {
 			$this->init_curl_session($curl_url);
 
 			curl_setopt($this->curl_session_id, CURLOPT_POST, false);
-			
-			$response = curl_exec($this->curl_session_id);            
+
+			$response = curl_exec($this->curl_session_id);
 			$result_call = json_decode($response);
-					
+
 			/*
 			 * return structure if success : Array of Projects
 			 $IDX => stdobj
@@ -234,11 +234,11 @@ class ExtAPITilkee extends ExternalAPIBase {
 			 $    stdobj->project->edit_url
 			 $    stdobj->project->preview_url
 			 $    stdobj->project->stat_url
-			 *  
+			 *
 			 */
 
 			if (isset($result_call->status) && isset($result_call->body->error)) {
-				$GLOBALS['log']->fatal('TILKEE - get_projects_list - result_call -> '.print_r($result_call,true));        
+				$GLOBALS['log']->fatal('TILKEE - get_projects_list - result_call -> '.print_r($result_call,true));
 				if ($result_call->status == 'unauthorized')
 					$this->get_token_access();
 				$this->set_log_error($result_call);
@@ -247,15 +247,15 @@ class ExtAPITilkee extends ExternalAPIBase {
 			return $result_call;
         } else {
             return -1 ;
-        } 
+        }
     }
-    
+
     /*
      * Info project
      * ERROR V1
-     */    
+     */
     function infos_project($project_id) {
-        
+
         $access_token = $this->get_valid_token();
 
         if (!empty($access_token)) {
@@ -263,15 +263,15 @@ class ExtAPITilkee extends ExternalAPIBase {
             $this->init_curl_session($curl_url);
 
             curl_setopt($this->curl_session_id, CURLOPT_POST, false);
-			
-            $response = curl_exec($this->curl_session_id); 
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
+
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
 			if($status != 200) return -1;
-			
+
 			$result_call = json_decode($response);
-			
+
             /*
-             * return structure if success : 
+             * return structure if success :
              $project->id
              $project->name
              $project->won
@@ -304,13 +304,24 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $this->set_log_error($result_call);
                 return $result_call ;
             } else {
+                /* Recuperation des tokens */
+                $curl_url = "/projects/".$project_id."/tokens";
+                $this->init_curl_session($curl_url);
+
+                curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+
+                $response = curl_exec($this->curl_session_id);
+                        $status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+                        if($status != 200) return -1;
+
+                        $tokens = json_decode($response);
 				$result_call->last_sign_in_at = $result_call->last_access;
 				$result_call->deleted_at       = '';
 				$result_call->visible_since    = $result_call->activated_at;
 				$result_call->leader_id        = $result_call->leader->id;
 				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
 				$result_call->won      		   = ($result_call->won=='na')?(''):($result_call->won);
-				$result_call->tilks_count      = '';
+				$result_call->tilks_count      = $tokens->total;
 				$result_call->active_tilk      = '';
 				$result_call->total_connexions = $result_call->nb_connections;
 				$result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
@@ -324,27 +335,27 @@ class ExtAPITilkee extends ExternalAPIBase {
             }
         } else {
             return -1 ;
-        }        
-    }  
-    
+        }
+    }
+
     /*
      * Create project
      * OK V1
-     */    
+     */
     function create_project($name, $kind = 'brochure', $duplicate_project_id = '') {
-        
-        
+
+
         $access_token = $this->get_valid_token();
         if (!empty($access_token)) {
             if($duplicate_project_id > 0) { // Cas duplicate
 				$curl_url = "/projects/".$duplicate_project_id."/duplicate";
 				$this->init_curl_session($curl_url);
-				$response = curl_exec($this->curl_session_id);    
+				$response = curl_exec($this->curl_session_id);
 				//TODO MAJ name !!
 			} else {
 				$curl_url = "/projects";
 				$this->init_curl_session($curl_url);
-        
+
 				$post_parameters = json_encode(array(
 					//"access_token"          => $access_token,
 					"name"                  => $name,
@@ -352,14 +363,14 @@ class ExtAPITilkee extends ExternalAPIBase {
 					//"duplicate_project_id"  => $duplicate_project_id
 				));
 				curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
-				$response = curl_exec($this->curl_session_id);  
-				
+				$response = curl_exec($this->curl_session_id);
+
 			}
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
 			if($status != 200) return -1;
 			$result_call = json_decode($response);
             /*
-             * return structure if success : 
+             * return structure if success :
              $project->id
              $project->name
              $project->won
@@ -382,22 +393,33 @@ class ExtAPITilkee extends ExternalAPIBase {
              $project->edit_url
              $project->preview_url
              $project->stat_url
-             *  
+             *
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('create_project - result_call -> '.print_r($result_call,true));            	
+            	$GLOBALS['log']->fatal('create_project - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
+                /* Recuperation des tokens */
+                $curl_url = "/projects/".$result_call->id."/tokens";
+                $this->init_curl_session($curl_url);
+
+                curl_setopt($this->curl_session_id, CURLOPT_POST, false);
+
+                $response = curl_exec($this->curl_session_id);
+                        $status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+                        if($status != 200) return -1;
+
+                        $tokens = json_decode($response);
 				$result_call->last_sign_in_at = $result_call->last_access;
 				$result_call->deleted_at       = '';
 				$result_call->visible_since    = $result_call->activated_at;
 				$result_call->leader_id        = $result_call->leader->id;
 				$result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
-				$result_call->tilks_count      = '';
+				$result_call->tilks_count      = $tokens->total;
 				$result_call->active_tilk      = '';
 				$result_call->won      		   = '';
 				$result_call->total_connexions = $result_call->nb_connections;
@@ -411,38 +433,38 @@ class ExtAPITilkee extends ExternalAPIBase {
             }
         } else {
             return -1 ;
-        }        
-    }   
-    
+        }
+    }
+
     /*
      * Update project
      * ERROR V1
-     */    
+     */
     function update_project($project_id, $name = '', $kind = '', $won = '', $archived = '') {
-        
+
         $access_token = $this->get_valid_token();
 
 		$curl_url = "/projects/".$project_id;
 		$this->init_curl_session($curl_url);
-        
+
         if (!empty($access_token)) {
             $put_parameters = array(
                 "name"         => $name,
-                "won"          => $won                
+                "won"          => $won
             );
 			if($archived) $put_parameters['archived_at']=date("Y-m-d H:i:s");
-			
+
 
 			curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
-			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));	
-			
-            $response = curl_exec($this->curl_session_id);  
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
+			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));
+
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
             $result_call = json_decode($response);
 
             /*
-             * return structure if success : 
+             * return structure if success :
              $project->id
              $project->name
              $project->won
@@ -465,11 +487,11 @@ class ExtAPITilkee extends ExternalAPIBase {
              $project->edit_url
              $project->preview_url
              $project->stat_url
-             *  
+             *
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('update_project - result_call -> '.print_r($result_call,true));            	            
+            	$GLOBALS['log']->fatal('update_project - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
@@ -493,40 +515,40 @@ class ExtAPITilkee extends ExternalAPIBase {
             }
         } else {
             return -1 ;
-        }        
-    }  
+        }
+    }
 
     /*
      * Delete project
      * ERROR V1
-     */    
+     */
     function delete_project($project_id) {
-        
+
         if ($project_id == '')
             return -1;
-        
+
         $access_token = $this->get_valid_token();
-        
+
         if (!empty($access_token)) {
             $curl_url = '/projects/'.$project_id;
-            $this->init_curl_session($curl_url);		   
-			
+            $this->init_curl_session($curl_url);
+
             curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'DELETE');
             curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, false);
-			
-            $response = curl_exec($this->curl_session_id);  
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
+
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
             $result_call = json_decode($response);
 
             /*
-             * return structure if success : 
+             * return structure if success :
              $"ProjectName has been deleted successfully"
-             *  
+             *
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('delete_project - result_call -> '.print_r($result_call,true));            	                        
+            	$GLOBALS['log']->fatal('delete_project - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
@@ -537,32 +559,32 @@ class ExtAPITilkee extends ExternalAPIBase {
             }
         } else {
             return -1 ;
-        }         
-    } 
+        }
+    }
 
         /*
      * Create tilk
      * OK V1
-     */    
+     */
     function infos_tilk($project_id, $tilk_id) {
-        
+
         $access_token = $this->get_valid_token();
-        
+
         if (!empty($access_token)) {
-            
+
             $curl_url = '/projects/'.$project_id.'/tokens';
             $this->init_curl_session($curl_url);
-            
+
             curl_setopt($this->curl_session_id, CURLOPT_POST, false);
-			
-            $response = curl_exec($this->curl_session_id);   
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
-			
+
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
+
             $result_call = json_decode($response);
 
             /*
-             * return structure if success : 
+             * return structure if success :
              $tilk->id
              $tilk->title
              $tilk->last_sign_in_at
@@ -578,7 +600,7 @@ class ExtAPITilkee extends ExternalAPIBase {
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('infos_tilk - result_call -> '.print_r($result_call,true));            	                                    
+            	$GLOBALS['log']->fatal('infos_tilk - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
@@ -588,8 +610,8 @@ class ExtAPITilkee extends ExternalAPIBase {
 					if($tilk->id ==$tilk_id) {
 						$tilk->title = $tilk->name;
 						$tilk->last_sign_in_at = $tilk->last_signin;
-						$tilk->url = $tilk->link; 
-						$tilk->contact_id = ''; 
+						$tilk->url = $tilk->link;
+						$tilk->contact_id = '';
 						$tilk->contact = '';
 						$tilk->total_connexion = $tilk->nb_connections;
 						$tilk->connexions = $this->infos_connections($project_id, $tilk_id);
@@ -602,28 +624,28 @@ class ExtAPITilkee extends ExternalAPIBase {
             }
         } else {
             return -1 ;
-        }        
-    } 
-    
+        }
+    }
+
 	function infos_connections($project_id, $tilk_id) {
-        
+
         $access_token = $this->get_valid_token();
-        
+
         if (!empty($access_token)) {
-            
+
             $curl_url = '/projects/'.$project_id.'/connexions?tokens='.$tilk_id;
             $this->init_curl_session($curl_url);
-            
+
             curl_setopt($this->curl_session_id, CURLOPT_POST, false);
-			
-            $response = curl_exec($this->curl_session_id); 
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
-			
+
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
+
             $result_call = json_decode($response);
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('infos_tilk - result_call -> '.print_r($result_call,true));            	                                    
+            	$GLOBALS['log']->fatal('infos_tilk - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
@@ -644,35 +666,35 @@ class ExtAPITilkee extends ExternalAPIBase {
 			}
         } else {
             return -1 ;
-        }        
+        }
     }
-	
+
     /*
      * Create tilk
      * OK V1
-     */    
+     */
     function create_tilk($project_id, $tilk_name, $contact_id = '') {
-$GLOBALS['log']->fatal("Debut function create_tilk: " . $project_id);	        
+$GLOBALS['log']->fatal("Debut function create_tilk: " . $project_id);
         $access_token = $this->get_valid_token();
-        
+
         if (!empty($access_token)) {
-            
+
             $curl_url = '/projects/'.$project_id.'/tokens';
             $this->init_curl_session($curl_url);
-            
+
             $post_parameters = '{"persons": [{"name": "'.$tilk_name.'"}]}';
-			
+
 
             curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, $post_parameters);
-//die($post_parameters.'-'.$access_token.'-'.$curl_url);			
-            $response = curl_exec($this->curl_session_id);    
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
-			
+//die($post_parameters.'-'.$access_token.'-'.$curl_url);
+            $response = curl_exec($this->curl_session_id);
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
+
             $result_call = json_decode($response);
 
             /*
-             * return structure if success : 
+             * return structure if success :
              $tilk->id
              $tilk->title
              $tilk->url
@@ -680,21 +702,21 @@ $GLOBALS['log']->fatal("Debut function create_tilk: " . $project_id);
              $tilk->archived_at
              $tilk->contact_id
              $tilk->contact
-             *  
+             *
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('create_tilk - result_call -> '.print_r($result_call,true));            	                                    
+            	$GLOBALS['log']->fatal('create_tilk - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
                 return -1 ;
             } else {
 				$tilk = $result_call->contents[0];
-//die(print_r($tilk));				
+//die(print_r($tilk));
 				$tilk->title = $tilk->name;
 				$tilk->url = $tilk->link;
-				$tilk->contact_id = ''; 
+				$tilk->contact_id = '';
 				$tilk->contact = '';
 				$tilk->archived_at = '';
 				//$tilk->won = '';
@@ -705,53 +727,53 @@ $GLOBALS['log']->fatal("Debut function create_tilk: " . $project_id);
                 return $tilk;
             }
         } else {
-			$GLOBALS['log']->fatal("Fin function create_tilk ERROR: " . $project_id);	        
+			$GLOBALS['log']->fatal("Fin function create_tilk ERROR: " . $project_id);
             return -1 ;
-        }        
-    } 
-    
-    
+        }
+    }
+
+
     /*
      * Update tilk
      * OK V1
-     */    
+     */
     function update_tilk($project_id, $tilk_id, $tilk_name = '', $won = '', $archived = '') {
-$GLOBALS['log']->fatal("Debut function update_tilk: " . $project_id.'-'.$tilk_id);	        
-        
+$GLOBALS['log']->fatal("Debut function update_tilk: " . $project_id.'-'.$tilk_id);
+
         $access_token = $this->get_valid_token();
         if (!empty($access_token)) {
-           
+
 			$curl_url = '/tokens/'.$tilk_id;
 			$put_parameters = array(
 			"name"        => $tilk_name,
 			"won"          => $won
 			);
-$GLOBALS['log']->fatal("Debut function update_tilk request: " . $curl_url.'-'.$access_token.'-'.print_r($put_parameters,true));	 			
+$GLOBALS['log']->fatal("Debut function update_tilk request: " . $curl_url.'-'.$access_token.'-'.print_r($put_parameters,true));
 			$this->init_curl_session($curl_url);
-			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));				
-			
+			curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, json_encode($put_parameters));
+
             curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
-			
+
             $response = curl_exec($this->curl_session_id);
-			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-			if($status != 200) return -1;			
-			
+			$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+			if($status != 200) return -1;
+
 			$result_call = json_decode($response);
-$GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_call,true));	 			
+$GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_call,true));
 			if($archived=='true') {
-				$GLOBALS['log']->fatal("Debut function update_tilk ARCHIVE !!: " . $archived.'-'.$tilk_id);	        
+				$GLOBALS['log']->fatal("Debut function update_tilk ARCHIVE !!: " . $archived.'-'.$tilk_id);
 				$curl_url = '/tokens/'.$tilk_id.'/archive';
 				$this->init_curl_session($curl_url);
 				curl_setopt($this->curl_session_id, CURLOPT_POSTFIELDS, false);
 				curl_setopt($this->curl_session_id, CURLOPT_CUSTOMREQUEST, 'PUT');
-				$response = curl_exec($this->curl_session_id);    
-				$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE); 
-				if($status != 200) return -1;			
-					
+				$response = curl_exec($this->curl_session_id);
+				$status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
+				if($status != 200) return -1;
+
 				$result_call = json_decode($response);
 			}
 			/*
-             * return structure if success : 
+             * return structure if success :
              $tilk->id
              $tilk->title
              $tilk->url
@@ -759,11 +781,11 @@ $GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_
              $tilk->archived_at
              $tilk->contact_id
              $tilk->contact
-             *  
+             *
              */
 
             if (isset($result_call->status) && isset($result_call->body->error)) {
-            	$GLOBALS['log']->fatal('update_tilk - result_call -> '.print_r($result_call,true));            	                                                
+            	$GLOBALS['log']->fatal('update_tilk - result_call -> '.print_r($result_call,true));
                 if ($result_call->status == 'unauthorized')
                         $this->get_token_access();
                 $this->set_log_error($result_call);
@@ -771,7 +793,7 @@ $GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_
             } else {
 				$result_call->title = $result_call->name;
 				$result_call->url = $result_call->link;
-				$result_call->contact_id = ''; 
+				$result_call->contact_id = '';
 				$result_call->contact = '';
 				$result_call->total_connexion = $result_call->nb_connections;
 				$result_call->connexions = $this->infos_connections($project_id, $tilk_id);
@@ -780,24 +802,24 @@ $GLOBALS['log']->fatal("Debut function update_tilk reponse: " . print_r($result_
             }
         } else {
             return -1 ;
-        }        
-    } 
-    
-        
+        }
+    }
+
+
     /*
      *  write error object information in SugarCRM log file
      */
     protected function set_log_error ($result_error,$error_level = "fatal") {
-        
+
         if (!isset($result_error->status))
             return ;
-        
+
         if ($error_level == "fatal")
             $GLOBALS['log']->fatal("TILKEE CONNECTOR ACCESS ERROR - ".print_r($result_error->body->error,true));
         else
             $GLOBALS['log']->info("TILKEE CONNECTOR INFO - ".print_r($result_error->body->error,true));
 
         SugarApplication::appendErrorMessage('TILKEE ERROR : '.$result_error->body->error->message);
-        
+
     }
 }
