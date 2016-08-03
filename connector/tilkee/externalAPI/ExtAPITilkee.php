@@ -325,6 +325,7 @@ class ExtAPITilkee extends ExternalAPIBase {
                 $result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
                 $result_call->won                 = ($result_call->won=='na')?(''):($result_call->won);
                 $result_call->tilks_count      = $tokens->total;
+                $result_call->tokens           = $tokens->contents;
                 $result_call->active_tilk      = '';
                 $result_call->total_connexions = $result_call->nb_connections;
                 $result_call->url              = $this->app_url_front.'/project/'.$result_call->id;
@@ -405,24 +406,14 @@ class ExtAPITilkee extends ExternalAPIBase {
                         $this->get_token_access();
                 $this->set_log_error($result_call);
                 return -1 ;
-            } else {
-                /* Recuperation des tokens */
-                $curl_url = "/projects/".$result_call->id."/tokens";
-                $this->init_curl_session($curl_url);
-
-                curl_setopt($this->curl_session_id, CURLOPT_POST, false);
-
-                $response = curl_exec($this->curl_session_id);
-                        $status = curl_getinfo($this->curl_session_id, CURLINFO_HTTP_CODE);
-                        if($status != 200) return -1;
-
-                        $tokens = json_decode($response);
+			} else {
                 $result_call->last_sign_in_at = $result_call->last_access;
                 $result_call->deleted_at       = '';
                 $result_call->visible_since    = $result_call->activated_at;
                 $result_call->leader_id        = $result_call->leader->id;
                 $result_call->leader           = $result_call->leader->first_name.' '.$result_call->leader->last_name;
-                $result_call->tilks_count      = $tokens->total;
+				$result_call->tilks_count      = '';
+				$result_call->tokens           = $result_call->tokens;
                 $result_call->active_tilk      = '';
                 $result_call->won                 = '';
                 $result_call->total_connexions = $result_call->nb_connections;

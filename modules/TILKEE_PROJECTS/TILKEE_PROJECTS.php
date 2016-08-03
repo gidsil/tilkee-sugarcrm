@@ -1,6 +1,6 @@
 <?PHP
 
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,30 +60,31 @@ class TILKEE_PROJECTS extends Basic {
     var $stat_url;
     var $stat_iframe;
     var $tilkee_id;
-    
-    function TILKEE_PROJECTS_sugar(){	
+
+    function TILKEE_PROJECTS_sugar(){
         parent::Basic();
     }
-	
+
     function bean_implements($interface){
         switch($interface){
                 case 'ACL': return true;
         }
         return false;
     }
-    
+
     function create_from_API ($duplicate_id = '') {
 
         if (empty($this->tilkee_id) || !empty($duplicate_id)) {
-            
             require_once('custom/include/externalAPI/Tilkee/ExtAPITilkee.php');
             $tilkee = new ExtAPITilkee();
             $result = $tilkee->create_project($this->name, $this->type, $duplicate_id);
-            
             if (($result != -1) && (!empty($result))){
-                if (!empty($duplicate_id)) 
+                if (!empty($duplicate_id))
                     $this->id = '';
                 $this->set_result_to_bean($result);
+                $cur_tilks = new TILKEE_TILKS();
+                $cur_tilks->updateFromArray($this->id, $result->tokens);
+
             } else {
                 global $mod_strings;
                 SugarApplication::appendErrorMessage($mod_strings['LBL_ERROR_CREATE_ON_TILKEE']);
@@ -93,18 +94,15 @@ class TILKEE_PROJECTS extends Basic {
     }
 
     function update_from_API ($won = '', $archived = '') {
-    
+
         require_once('custom/include/externalAPI/Tilkee/ExtAPITilkee.php');
         $tilkee = new ExtAPITilkee();
         $result = $tilkee->update_project($this->tilkee_id, $this->name, $this->type, $won, $archived);
 
         if (($result != -1) && (!empty($result))){
-                            
             $this->set_result_to_bean($result);
-            
             // Create or update tilks from return data
             $tilks_array = $result->tilks ;
-            
         } else {
             global $mod_strings;
             SugarApplication::appendErrorMessage($mod_strings['LBL_ERROR_UPDATE_ON_TILKEE']);
@@ -116,7 +114,7 @@ class TILKEE_PROJECTS extends Basic {
     // when $mode is 'update_tilks', the tilks array is updated
     //
     function sync_from_API ($mode = '') {
-        
+
         if (!empty($this->tilkee_id)) {
             require_once('custom/include/externalAPI/Tilkee/ExtAPITilkee.php');
             $tilkee = new ExtAPITilkee();
@@ -132,7 +130,7 @@ class TILKEE_PROJECTS extends Basic {
                     global $beanFiles;
                     require_once($beanFiles['TILKEE_TILKS']);
                     $cur_tilks = new TILKEE_TILKS();
-                    $cur_tilks->updateFromArray($this->id, $result->tilks);                    
+                    $cur_tilks->updateFromArray($this->id, $result->tilks);
                 }
 
                 // TBD
@@ -146,9 +144,9 @@ class TILKEE_PROJECTS extends Basic {
 
     //
     // set result to current bean
-    // 
+    //
     function set_result_to_bean ($result) {
-        
+
         $this->name             = $result->name;
         $this->type             = $result->kind;
         $this->status           = $result->status;
@@ -174,20 +172,20 @@ class TILKEE_PROJECTS extends Basic {
         $this->active_tilk      = $result->active_tilk;
         $this->total_connexions = $result->total_connexions;
 
-        //URL 
+        //URL
         $this->url              = $result->url;
         $this->edit_url         = $result->edit_url;
         $this->preview_url      = $result->preview_url;
         $this->stat_url         = $result->stat_url;
         $this->stat_iframe      = $result->stat_iframe;
-        
+
         if (empty($this->tilkee_id))
             $this->tilkee_id = $result->id;
 
-        $this->save();        
-        
+        $this->save();
+
     }
-    
+
     //
     // convert time in second and decimal into string with hour/minute/second
     //
@@ -204,11 +202,11 @@ class TILKEE_PROJECTS extends Basic {
         if ($nb_minutes >= 60) {
                 $nb_heures = $nb_minutes / 60;
                 $nb_minutes = $nb_minutes % 60;
-                $str_time = floor($nb_heures).'h '.$nb_minutes.'m '.$str_time;									
+                $str_time = floor($nb_heures).'h '.$nb_minutes.'m '.$str_time;
         } else {
                 $str_time = floor($nb_minutes).'m '.$str_time;
-        }		
+        }
         return $str_time;
-    }    
+    }
 }
 ?>
