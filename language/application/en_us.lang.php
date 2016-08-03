@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,10 @@ $app_list_strings['status_list']['reviewing']        = 'Draft';
 $app_list_strings['status_list']['pending_approval'] = 'Pending Approval';
 $app_list_strings['status_list']['activated']        = 'Activated';
 $app_list_strings['status_list']['archived']         = 'Archived';
+
+$app_list_strings['won_list']['won'] = 'won';
+$app_list_strings['won_list']['lost']= 'lost';
+$app_list_strings['won_list']['na']= 'N/A';
 
 $app_list_strings['won_archived_list']['null']       = '';
 $app_list_strings['won_archived_list']['true']   = 'True';
