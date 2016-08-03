@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * Copyright 2014 TILKEE.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +16,16 @@
  */
 
 $manifest = array (
-  0 => 
+  0 =>
   array (
-    'acceptable_sugar_versions' => 
+    'acceptable_sugar_versions' =>
     array (
       0 => '6.5.*',
     ),
   ),
-  1 => 
+  1 =>
   array (
-    'acceptable_sugar_flavors' => 
+    'acceptable_sugar_flavors' =>
     array (
       0 => 'CE',
       1 => 'PRO',
@@ -42,7 +42,7 @@ $manifest = array (
   'name' => 'TILKEE Connector',
   'published_date' => '2014-09-18 00:00:00',
   'type' => 'module',
-  'version' => '1.0.5',
+  'version' => '1.0.6',
   'remove_tables' => 'prompt',
 );
 
@@ -55,13 +55,13 @@ $installdefs = array (
             'to_module' => 'application',
         ),
     ),
-    
+
     'scheduledefs' => array (
         array (
             'from' => '<basepath>/modules/Schedulers/Scheduled_syncTILKEE.php',
         ),
-    ), 
-    
+    ),
+
     'pre_execute'=>array(
         0 => '<basepath>/scripts/pre_execute_script.php',
     ),
@@ -75,7 +75,7 @@ $installdefs = array (
         0 => '<basepath>/scripts/post_uninstall_script.php',
     ),
 
-    'beans' => 
+    'beans' =>
     array (
       array (
         'module' => 'TILKEE_PROJECTS',
@@ -97,7 +97,7 @@ $installdefs = array (
       ),
     ),
 
-    'logic_hooks' => array(  
+    'logic_hooks' => array(
         array(
         'module' => 'Opportunities',
         'hook' => 'after_save',
@@ -106,7 +106,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_PROJECTS/hooks.php',
         'class' => 'hook_tilkee_projects',
         'function' => 'update_project_from_opportunity',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_PROJECTS',
         'hook' => 'before_save',
@@ -115,7 +115,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_PROJECTS/hooks.php',
         'class' => 'hook_tilkee_projects',
         'function' => 'update_tilkee_project',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_PROJECTS',
         'hook' => 'after_save',
@@ -124,7 +124,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_PROJECTS/hooks.php',
         'class' => 'hook_tilkee_projects',
         'function' => 'update_tilkee_project_API',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_PROJECTS',
         'hook' => 'before_delete',
@@ -133,7 +133,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_PROJECTS/hooks.php',
         'class' => 'hook_tilkee_projects',
         'function' => 'delete_tilkee_project',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_TILKS',
         'hook' => 'before_delete',
@@ -142,7 +142,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_TILKS/hooks.php',
         'class' => 'hook_tilkee_tilks',
         'function' => 'delete_tilkee_tilk',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_TILKS',
         'hook' => 'before_save',
@@ -151,7 +151,7 @@ $installdefs = array (
         'file' => 'modules/TILKEE_TILKS/hooks.php',
         'class' => 'hook_tilkee_tilks',
         'function' => 'update_tilkee_tilk',
-        ),        
+        ),
         array(
         'module' => 'TILKEE_TILKS',
         'hook' => 'after_save',
@@ -160,10 +160,10 @@ $installdefs = array (
         'file' => 'modules/TILKEE_TILKS/hooks.php',
         'class' => 'hook_tilkee_tilks',
         'function' => 'update_tilkee_tilk_API',
-        ),        
+        ),
     ),
-    
-    'relationships' => 
+
+    'relationships' =>
     array (
       array (
         'meta_data' => '<basepath>/relationships/relationships/tilkee_tilks_contactsMetaData.php',
@@ -186,7 +186,7 @@ $installdefs = array (
     ),
 
 
-    'layoutdefs' => 
+    'layoutdefs' =>
     array (
       array (
         'from' => '<basepath>/relationships/layoutdefs/tilkee_projects_accounts_Accounts.php',
@@ -212,16 +212,16 @@ $installdefs = array (
         'from' => '<basepath>/relationships/layoutdefs/tilkee_tilks_tilkee_connexions_TILKEE_TILKS.php',
         'to_module' => 'TILKEE_TILKS',
       ),
-    ),    
+    ),
 
     'administration' => array (
         array(
             'from' => '<basepath>/modules/Administration/tilkee_admin.php',
         ),
     ),
-    
+
     'image_dir' => '<basepath>/icons',
-    
+
     // Copy External API
     'copy' => array (
         array (
@@ -259,14 +259,14 @@ $installdefs = array (
         array (
             'from' => '<basepath>/entrypoints/retour_token.php',
             'to' => 'custom/entrypoints/retour_token.php',
-        ),        
+        ),
         array (
             'from' => '<basepath>/files/retourToken.php',
             'to' => 'retourToken.php',
-        ),        
+        ),
     ),
-    
-    'language' => 
+
+    'language' =>
     array (
       array (
         'from' => '<basepath>/relationships/language/TILKEE_TILKS.php',
@@ -418,75 +418,75 @@ $installdefs = array (
         'to_module' => 'application',
         'language' => 'fr_FR',
       ),
-    ),    
+    ),
 
-    'vardefs' => 
+    'vardefs' =>
       array (
-        0 => 
+        0 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_contacts_TILKEE_TILKS.php',
           'to_module' => 'TILKEE_TILKS',
         ),
-        1 => 
+        1 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_contacts_Contacts.php',
           'to_module' => 'Contacts',
         ),
-        2 => 
+        2 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_leads_TILKEE_TILKS.php',
           'to_module' => 'TILKEE_TILKS',
         ),
-        3 => 
+        3 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_leads_Leads.php',
           'to_module' => 'Leads',
         ),
-        4 => 
+        4 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_tilkee_connexions_TILKEE_CONNEXIONS.php',
           'to_module' => 'TILKEE_CONNEXIONS',
         ),
-        5 => 
+        5 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_tilks_tilkee_connexions_TILKEE_TILKS.php',
           'to_module' => 'TILKEE_TILKS',
         ),
-        6 => 
+        6 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_accounts_TILKEE_PROJECTS.php',
           'to_module' => 'TILKEE_PROJECTS',
         ),
-        7 => 
+        7 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_accounts_Accounts.php',
           'to_module' => 'Accounts',
         ),
-        8 => 
+        8 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_opportunities_TILKEE_PROJECTS.php',
           'to_module' => 'TILKEE_PROJECTS',
         ),
-        9 => 
+        9 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_opportunities_Opportunities.php',
           'to_module' => 'Opportunities',
         ),
-        10 => 
+        10 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_tilkee_tilks_TILKEE_TILKS.php',
           'to_module' => 'TILKEE_TILKS',
         ),
-        11 => 
+        11 =>
         array (
           'from' => '<basepath>/relationships/vardefs/tilkee_projects_tilkee_tilks_TILKEE_PROJECTS.php',
           'to_module' => 'TILKEE_PROJECTS',
         ),
-      ), 
-    
-'custom_fields' => 
+      ),
+
+'custom_fields' =>
     array(
-////////////// FIELD FOR USERS //////////////        
+////////////// FIELD FOR USERS //////////////
         array (
           'name' => 'tilkee_token_c',
           'label' => 'LBL_TILKEE_TOKEN',
