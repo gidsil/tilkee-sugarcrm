@@ -42,7 +42,7 @@ $manifest = array (
   'name' => 'TILKEE Connector',
   'published_date' => '2014-09-18 00:00:00',
   'type' => 'module',
-  'version' => '1.0.6',
+  'version' => '1.0.7',
   'remove_tables' => 'prompt',
 );
 

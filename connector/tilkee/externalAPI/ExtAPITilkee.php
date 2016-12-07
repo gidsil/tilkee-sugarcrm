@@ -24,7 +24,7 @@ require_once('include/externalAPI/Base/ExternalAPIBase.php');
 class ExtAPITilkee extends ExternalAPIBase {
 
     var $app_base_url  = "https://api.tilkee.com";
-    var $app_url_front = "https://app2.tilkee.com";
+    var $app_url_front = "https://app.tilkee.com";
     var $client_id     = "";
     var $client_secret = "";
     var $access_token  = "";
@@ -42,7 +42,8 @@ class ExtAPITilkee extends ExternalAPIBase {
         if (isset($sugar_config['tilkee']['url_tilkee_front']) && !empty($sugar_config['tilkee']['url_tilkee_front'])) {
             $this->app_url_front = $sugar_config['tilkee']['url_tilkee_front'];
         }
-        $this->app_url_front  = (strtolower($GLOBALS['current_language'])=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
+        //$this->app_url_front  = (strtolower($GLOBALS['current_language'])=='fr_fr')?($this->app_url_front.'/fr/#'):($this->app_url_front.'/en/#');
+        $this->app_url_front  = $this->app_url_front.'/#';
         $GLOBALS['log']->debug('TILKEE - app_base_url:'.$this->app_base_url.' - app_url_front:'.$this->app_url_front);
     }
 
